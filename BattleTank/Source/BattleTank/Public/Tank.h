@@ -11,12 +11,7 @@ UCLASS()
 class BATTLETANK_API ATank : public APawn
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this pawn's properties
-	ATank();
-
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,6 +20,9 @@ protected:
 
 
 public:	
+	// Sets default values for this pawn's properties
+	ATank();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -35,5 +33,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
+
+
+private:
+	UPROPERTY(EditAnywhere, Category = Firing)
+	float LaunchSpeed = 100000.0f; //TODO find sensible default value
+
 	
 };

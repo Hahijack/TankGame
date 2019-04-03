@@ -16,7 +16,7 @@ public:
 	// Sets default values for this component's properties
 	UTankAimingComponent();
 
-	void AimAt(FVector WorldSpaceAim);
+	void AimAt(FVector WorldSpaceAim, float LaunchSpeed);
 
 	void SetBarrelReference(UStaticMeshComponent* BarrelToSet);
 
@@ -31,6 +31,9 @@ public:
 
 private:
 	UStaticMeshComponent * Barrel = nullptr;
+
+	void MoveBarrel(FVector AimDirection);
+
 		
 	
 };
