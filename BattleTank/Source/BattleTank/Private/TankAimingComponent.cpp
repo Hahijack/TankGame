@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "TankBarrel.h"
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
@@ -15,26 +16,9 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
-void UTankAimingComponent::SetBarrelReference(UStaticMeshComponent* BarrelToSet)
+void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
 	Barrel = BarrelToSet;
-}
-
-// Called when the game starts
-void UTankAimingComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-// Called every frame
-void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
@@ -51,7 +35,7 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 	if (UGameplayStatics::SuggestProjectileVelocity(this, OutLaunchVelocity, StartLocation, WorldSpaceAim, LaunchSpeed))
 	{
 		FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
-		//Move the barrel
+		MoveBarrel(AimDirection);
 
 		UE_LOG(LogTemp, Warning, TEXT("%s is aiming at: %s"), *GetOwner()->GetName(), *AimDirection.ToString());
 	}
@@ -60,7 +44,14 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 void UTankAimingComponent::MoveBarrel(FVector AimDirection)
 {
 	//set barrel y position to AimDirection.Y
-	//rotate tank 'head' to AimDirection.X, AimDirection.Z aka Yaw & Azimoth
+	FQuat ForwardRotator = Barrel->GetForwardVector().Rotation().Quaternion();
+	FQuat AimRotator = AimDirection.Rotation().Quaternion();
+	FRotator DeltaRotator = (AimRotator - ForwardRotator).Rotator();
+	UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s"), *AimRotator.ToString());
+
+	Barrel->Elevate(5);
+	
+	//rotate tank 'head' to AimDirection.X, AimDirection.Z aka Yaw
 }
 
 
