@@ -2,9 +2,9 @@
 
 #include "TankAimingComponent.h"
 #include "GameFramework/Actor.h"
-#include "Components/StaticMeshComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "TankBarrel.h"
+#include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
@@ -15,11 +15,17 @@ UTankAimingComponent::UTankAimingComponent()
 
 	// ...
 }
+ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) 
+{
+	 Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
 
 void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
 	Barrel = BarrelToSet;
 }
+
 
 void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 {
@@ -32,12 +38,16 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 	}
 	FVector OutLaunchVelocity = FVector(0);
 	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
+	auto time = GetWorld()->GetTimeSeconds();
 	if (UGameplayStatics::SuggestProjectileVelocity(this, OutLaunchVelocity, StartLocation, WorldSpaceAim, LaunchSpeed))
 	{
 		FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrel(AimDirection);
-
-		UE_LOG(LogTemp, Warning, TEXT("%s is aiming at: %s"), *GetOwner()->GetName(), *AimDirection.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("%f is aiming at: %s"), time, *AimDirection.ToString());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%f no aim solution"), time);
 	}
 }
 
@@ -47,7 +57,7 @@ void UTankAimingComponent::MoveBarrel(FVector AimDirection)
 	FQuat ForwardRotator = Barrel->GetForwardVector().Rotation().Quaternion();
 	FQuat AimRotator = AimDirection.Rotation().Quaternion();
 	FRotator DeltaRotator = (AimRotator - ForwardRotator).Rotator();
-	UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s"), *AimRotator.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s"), *AimRotator.ToString());
 
 	Barrel->Elevate(5);
 	

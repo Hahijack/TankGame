@@ -28,6 +28,8 @@ private:
 
 	void MoveBarrel(FVector AimDirection);
 
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 		
 	
 };
