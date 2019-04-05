@@ -8,6 +8,7 @@
 
 
 class UTankBarrel; 
+class UTankTurret;
 
 //holds barrel's properties and Elevate method
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,11 +23,15 @@ public:
 	void AimAt(FVector WorldSpaceAim, float LaunchSpeed);
 
 	void SetBarrelReference(UTankBarrel* BarrelToSet);
+	void SetTurretReference(UTankTurret* TurretToSet);
 
 private:
 	UTankBarrel * Barrel = nullptr;
+	UTankTurret * Turret = nullptr;
 
 	void MoveBarrel(FVector AimDirection);
+
+	void MoveTurret(FVector AimDirection);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

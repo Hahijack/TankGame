@@ -3,8 +3,10 @@
 #include "TankAimingComponent.h"
 #include "GameFramework/Actor.h"
 #include "TankBarrel.h"
+#include "TankTurret.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "math.h"
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
@@ -26,14 +28,20 @@ void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 	Barrel = BarrelToSet;
 }
 
+void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet)
+{
+	Turret = TurretToSet;
+}
+
 
 void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 {
 	/*FString OurTankName = GetOwner()->GetName(); //get tank name (Actor->GetName)
 	FString BarrelLocation = Barrel->GetComponentLocation().ToString(); //Get component location (SceneComponent->GetComponentLocation)
 	*/
-	if (!Barrel)
+	if (!Barrel || !Turret)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Barrel or Turret is null"));
 		return;
 	}
 	FVector OutLaunchVelocity = FVector(0);
@@ -43,6 +51,7 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 	{
 		FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrel(AimDirection);
+		MoveTurret(AimDirection);
 		UE_LOG(LogTemp, Warning, TEXT("%f is aiming at: %s"), time, *AimDirection.ToString());
 	}
 	else
@@ -54,14 +63,32 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 void UTankAimingComponent::MoveBarrel(FVector AimDirection)
 {
 	//set barrel y position to AimDirection.Y
-	FQuat ForwardRotator = Barrel->GetForwardVector().Rotation().Quaternion();
-	FQuat AimRotator = AimDirection.Rotation().Quaternion();
-	FRotator DeltaRotator = (AimRotator - ForwardRotator).Rotator();
+	FRotator ForwardRotator = Barrel->GetForwardVector().Rotation();
+	FRotator AimRotator = AimDirection.Rotation();
+	FRotator DeltaRotator = (AimRotator - ForwardRotator);
 	//UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s"), *AimRotator.ToString());
 
-	Barrel->Elevate(5);
+	Barrel->Elevate(DeltaRotator.Pitch);
 	
 	//rotate tank 'head' to AimDirection.X, AimDirection.Z aka Yaw
 }
+
+void UTankAimingComponent::MoveTurret(FVector AimDirection)
+{
+	FRotator ForwardRotator = Turret->GetForwardVector().Rotation();
+	FRotator AimRotator = AimDirection.Rotation();
+	FRotator DeltaRotator = (AimRotator - ForwardRotator);
+	//UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s"), *AimRotator.ToString());
+	if (FMath::Abs(DeltaRotator.Yaw) > 180) 
+	{
+		Turret->Rotate(-DeltaRotator.Yaw);
+	}
+	else
+	{
+		Turret->Rotate(DeltaRotator.Yaw);
+	}
+
+}
+
 
 
