@@ -52,11 +52,11 @@ void UTankAimingComponent::AimAt(FVector WorldSpaceAim, float LaunchSpeed)
 		FVector AimDirection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrel(AimDirection);
 		MoveTurret(AimDirection);
-		UE_LOG(LogTemp, Warning, TEXT("%f is aiming at: %s"), time, *AimDirection.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("%f is aiming at: %s"), time, *AimDirection.ToString());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%f no aim solution"), time);
+		//UE_LOG(LogTemp, Warning, TEXT("%f no aim solution"), time);
 	}
 }
 
