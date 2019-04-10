@@ -2,7 +2,9 @@
 
 #include "Public/Tank.h"
 #include "Public/TankAimingComponent.h"
-
+#include "Public/TankBarrel.h"
+#include "Engine/World.h"
+#include "Projectile.h"
 // Forward declarations
 ATank::ATank()
 {
@@ -33,6 +35,7 @@ void ATank::AimAt(FVector Location) const
 
 void ATank::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
+	Barrel = BarrelToSet;
 	TankAimingComponent->SetBarrelReference(BarrelToSet);
 }
 
@@ -44,6 +47,10 @@ void ATank::SetTurretReference(UTankTurret* TurretToSet)
 void ATank::Fire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
+	if (Barrel)
+	{
+		GetWorld()->SpawnActor<AProjectile>(ProjectileBluePrint, Barrel->GetSocketLocation(FName("Projectile")), Barrel->GetSocketRotation(FName("Projectile")));
+	}
 }
 
 
